@@ -15,10 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from stocks import views
+from stocks.views import FrontendAppView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/analysis/', views.stock_analysis),
+    path('api/save-portfolio/', views.save_portfolio),
+
+
+    # 🧠 React frontend fallback (excluding admin and api paths)
+    re_path(r'^(?!admin/|api/).*$', FrontendAppView.as_view(), name='home'),
 ]
