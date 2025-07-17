@@ -3,8 +3,10 @@ from rest_framework.response import Response
 from .utils import get_stock_data
 from .quant import calculate_returns, plot_efficient_frontier
 from .models import SavedPortfolio
-from django.views.generic import TemplateView
+from django.views.generic import View, TemplateView
+from django.http import HttpResponse
 import numpy as np
+import os
 
 @api_view(['POST'])
 def stock_analysis(request):
@@ -64,5 +66,10 @@ def save_portfolio(request):
         'id': portfolio.id
     })
 
-class FrontendAppView(TemplateView):
-    template_name = "index.html"
+class FrontendAppView(View):
+    def get(self, request):
+        try:
+            with open(os.path.join(os.path.dirname(__file__), '../frontend/build/index.html')) as f:
+                return HttpResponse(f.read())
+        except FileNotFoundError:
+            return HttpResponse("index.html not found", status=501)

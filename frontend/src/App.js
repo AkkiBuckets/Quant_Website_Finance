@@ -21,19 +21,20 @@ function App() {
 
     try {
       const response = await axios.post(
-        "/api/analysis/",
+        "http://localhost:8000/api/analysis/",  // full URL to backend
         { symbols: symbols.split(",").map(s => s.trim().toUpperCase()) },
         { headers: { "Content-Type": "application/json" } }
       );
       setAnalysisResult(response.data);
     } catch (err) {
-      setError("❌ Failed to fetch analysis. Check symbol(s) or server.");
+      setError(`❌ Failed to fetch analysis. ${err.response?.data?.error || err.message}`);
     }
 
     setLoading(false);
   };
 
-  const savePortfolio = async () => {
+  const savePortfolio = async (e) => {
+    e.preventDefault();  // prevent form reload
     if (!portfolioName || !analysisResult) {
       setSaveMessage("❌ Portfolio name and analysis required.");
       return;
@@ -41,7 +42,7 @@ function App() {
 
     try {
       await axios.post(
-        "/api/save-portfolio/",
+        "http://localhost:8000/api/save-portfolio/",  // full URL to backend
         {
           portfolio_name: portfolioName,
           user_name: userName,
@@ -55,13 +56,13 @@ function App() {
       );
       setSaveMessage("✅ Portfolio logged successfully!");
     } catch (err) {
-      setSaveMessage("❌ Failed to log portfolio.");
+      setSaveMessage(`❌ Failed to log portfolio. ${err.response?.data?.error || err.message}`);
     }
   };
 
   return (
     <div style={{ maxWidth: 700, margin: "auto", padding: 20, fontFamily: "Arial, sans-serif" }}>
-      
+
       <div style={{ textAlign: "right", marginBottom: 10 }}>
         <a
           href="http://localhost:8000/admin/"
